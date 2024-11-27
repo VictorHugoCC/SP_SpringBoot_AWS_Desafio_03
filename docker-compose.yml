@@ -1,0 +1,83 @@
+services:
+  postgres-cliente:
+    image: postgres:latest
+    container_name: postgres-cliente
+    environment:
+      POSTGRES_USER: cliente_user
+      POSTGRES_PASSWORD: cliente_password
+      POSTGRES_DB: cliente_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-cliente-data:/var/lib/postgresql/data
+
+  postgres-estoque:
+    image: postgres:latest
+    container_name: postgres-estoque
+    environment:
+      POSTGRES_USER: estoque_user
+      POSTGRES_PASSWORD: estoque_password
+      POSTGRES_DB: estoque_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-estoque-data:/var/lib/postgresql/data
+
+  postgres-pedido:
+    image: postgres:latest
+    container_name: postgres-pedido
+    environment:
+      POSTGRES_USER: pedido_user
+      POSTGRES_PASSWORD: pedido_password
+      POSTGRES_DB: pedido_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-pedido-data:/var/lib/postgresql/data
+
+  cliente:
+    build:
+      context: ./cliente
+    container_name: cliente
+    depends_on:
+      - postgres-cliente
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-cliente:5432/cliente_db
+      SPRING_DATASOURCE_USERNAME: cliente_user
+      SPRING_DATASOURCE_PASSWORD: cliente_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8081:8080"
+
+  estoque:
+    build:
+      context: ./estoque
+    container_name: estoque
+    depends_on:
+      - postgres-estoque
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-estoque:5432/estoque_db
+      SPRING_DATASOURCE_USERNAME: estoque_user
+      SPRING_DATASOURCE_PASSWORD: estoque_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8082:8080"
+
+  pedido:
+    build:
+      context: ./pedido
+    container_name: pedido
+    depends_on:
+      - postgres-pedido
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-pedido:5432/pedido_db
+      SPRING_DATASOURCE_USERNAME: pedido_user
+      SPRING_DATASOURCE_PASSWORD: pedido_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8083:8080"
+
+volumes:
+  postgres-cliente-data:
+  postgres-estoque-data:
+  postgres-pedido-data:
