@@ -3,6 +3,7 @@ package org.service.cliente.service;
 import org.service.cliente.feign.PedidoClient;
 import org.service.cliente.model.Cliente;
 import org.service.cliente.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +12,11 @@ import java.util.Optional;
 @Service
 public class ClienteService {
 
-    private final ClienteRepository clienteRepository;
-    private final PedidoClient pedidoClient;
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private PedidoClient pedidoClient;
 
     public ClienteService(ClienteRepository clienteRepository, PedidoClient pedidoClient) {
         this.clienteRepository = clienteRepository;
