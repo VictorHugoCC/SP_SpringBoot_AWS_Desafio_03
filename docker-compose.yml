@@ -1,3 +1,7 @@
+networks:
+  app-network:
+    driver: bridge
+
 services:
   postgres-cliente:
     image: postgres:latest
@@ -10,6 +14,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres-cliente-data:/var/lib/postgresql/data
+      - ./init-cliente.sql:/docker-entrypoint-initdb.d/init-cliente.sql
+    networks:
+      - app-network
 
   postgres-estoque:
     image: postgres:latest
@@ -22,6 +29,9 @@ services:
       - "5433:5432"
     volumes:
       - postgres-estoque-data:/var/lib/postgresql/data
+      - ./init-estoque.sql:/docker-entrypoint-initdb.d/init-estoque.sql
+    networks:
+      - app-network
 
   postgres-pedido:
     image: postgres:latest
@@ -34,6 +44,9 @@ services:
       - "5434:5432"
     volumes:
       - postgres-pedido-data:/var/lib/postgresql/data
+      - ./init-pedido.sql:/docker-entrypoint-initdb.d/init-pedido.sql
+    networks:
+      - app-network
 
   cliente:
     build:
@@ -48,6 +61,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8081:8080"
+    command: ["./wait-for-it.sh", "postgres-cliente:5432", "--", "java", "-jar", "app.jar"]
+    networks:
+      - app-network
 
   estoque:
     build:
@@ -62,6 +78,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8082:8080"
+    command: ["./wait-for-it.sh", "postgres-estoque:5432", "--", "java", "-jar", "app.jar"]
+    networks:
+      - app-network
 
   pedido:
     build:
@@ -76,6 +95,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
       - "8083:8080"
+    command: ["./wait-for-it.sh", "postgres-pedido:5432", "--", "java", "-jar", "app.jar"]
+    networks:
+      - app-network
 
 volumes:
   postgres-cliente-data:
