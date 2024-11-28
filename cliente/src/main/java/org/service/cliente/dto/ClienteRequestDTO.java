@@ -5,7 +5,6 @@ public class ClienteRequestDTO {
     private String email;
     private String telefone;
 
-    // Getters and Setters
     public String getNome() {
         return nome;
     }

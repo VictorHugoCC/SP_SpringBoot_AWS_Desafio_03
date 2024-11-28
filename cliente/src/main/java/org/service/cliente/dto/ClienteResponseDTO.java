@@ -6,7 +6,6 @@ public class ClienteResponseDTO {
     private String email;
     private String telefone;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
