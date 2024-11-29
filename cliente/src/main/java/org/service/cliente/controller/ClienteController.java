@@ -76,4 +76,10 @@ public class ClienteController {
         cliente.setTelefone(requestDTO.getTelefone());
         return cliente;
     }
+
+    @GetMapping("/{id}/historico-pedidos")
+    public ResponseEntity<Object> getHistoricoPedidos(@PathVariable Long id) {
+        return ResponseEntity.ok(clienteService.getHistoricoPedidos(id));
+    }
+
 }
