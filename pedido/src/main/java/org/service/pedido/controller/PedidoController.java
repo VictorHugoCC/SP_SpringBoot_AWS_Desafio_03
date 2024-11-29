@@ -46,8 +46,6 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoAtualizado);
     }
 
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPedido(@PathVariable Long id) {
         pedidoService.deletarPedido(id);
@@ -59,5 +57,12 @@ public class PedidoController {
         pedidoService.deletarTodosOsPedidos();
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/cliente")
+    public ResponseEntity<List<PedidoResponseDTO>> getPedidosByClienteNome(@RequestParam String clienteNome) {
+        return ResponseEntity.ok(pedidoService.findByClienteId(clienteNome));
+    }
+
+
 
 }

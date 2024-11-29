@@ -31,27 +31,18 @@ public class PedidoService {
     }
 
     public PedidoResponseDTO criarPedido(PedidoRequestDTO pedidoRequestDTO) {
-        logger.info("Iniciando a criação do pedido para o cliente: {}", pedidoRequestDTO.getCliente());
-
         pedidoRequestDTO.getProdutos().forEach((produtoId, quantidade) -> {
-            logger.info("Validando o estoque para produto ID: {}, quantidade solicitada: {}", produtoId, quantidade);
-            try {
-                ProdutoEstoqueDTO produtoEstoque = estoqueClient.getProdutoById(produtoId);
-                logger.info("Produto encontrado: ID: {}, Nome: {}, Quantidade disponível: {}",
-                        produtoEstoque.getId(), produtoEstoque.getNome(), produtoEstoque.getQuantidade());
+            ProdutoEstoqueDTO produtoEstoque = estoqueClient.getProdutoById(produtoId);
 
-                if (produtoEstoque.getQuantidade() < quantidade) {
-                    logger.error("Estoque insuficiente para produto ID: {}. Disponível: {}, Solicitado: {}",
-                            produtoId, produtoEstoque.getQuantidade(), quantidade);
-                    throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoEstoque.getNome());
-                }
-
-                estoqueClient.atualizarQuantidade(produtoId, -quantidade);
-                logger.info("Estoque atualizado para produto ID: {}. Quantidade reduzida: {}", produtoId, quantidade);
-            } catch (Exception e) {
-                logger.error("Erro ao validar/atualizar estoque para produto ID: {}. Erro: {}", produtoId, e.getMessage());
-                throw new RuntimeException("Erro na comunicação com o serviço de estoque: " + e.getMessage());
+            if (produtoEstoque == null) {
+                throw new IllegalArgumentException("Produto com ID " + produtoId + " não encontrado no estoque.");
             }
+
+            if (produtoEstoque.getQuantidade() < quantidade) {
+                throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoEstoque.getNome());
+            }
+
+            estoqueClient.atualizarQuantidade(produtoId, -quantidade);
         });
 
         Pedido pedido = new Pedido();
@@ -60,7 +51,6 @@ public class PedidoService {
         pedido.setStatus("CONFIRMADO");
 
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
-        logger.info("Pedido criado com sucesso! ID do pedido: {}", pedidoSalvo.getId());
 
         return new PedidoResponseDTO(
                 pedidoSalvo.getId(),
@@ -69,6 +59,7 @@ public class PedidoService {
                 pedidoSalvo.getStatus()
         );
     }
+
 
 
     public List<PedidoResponseDTO> findAll() {
@@ -137,4 +128,18 @@ public class PedidoService {
         pedidoRepository.deleteAll();
         logger.info("Todos os pedidos foram deletados com sucesso.");
     }
+
+    public List<PedidoResponseDTO> findByClienteId(String clienteNome) {
+        List<Pedido> pedidos = pedidoRepository.findByCliente(clienteNome);
+        return pedidos.stream()
+                .map(pedido -> new PedidoResponseDTO(
+                        pedido.getId(),
+                        pedido.getCliente(),
+                        pedido.getProdutos(),
+                        pedido.getStatus()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
 }
