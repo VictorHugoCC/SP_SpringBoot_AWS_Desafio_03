@@ -75,15 +75,19 @@ public class ProdutoController {
         ));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> updateProduto(
-            @PathVariable Long id, @RequestBody ProdutoCreateDTO produtoDTO) {
-        return produtoService.findById(id)
-                .map(produtoExistente -> {
-                    return getProdutoResponseDTOResponseEntity(produtoDTO, produtoExistente);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @PutMapping("/{id}/quantidade")
+    public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
+            @PathVariable Long id, @RequestParam int quantidade) {
+        Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidade);
+        return ResponseEntity.ok(new ProdutoResponseDTO(
+                produtoAtualizado.getId(),
+                produtoAtualizado.getNome(),
+                produtoAtualizado.getDescricao(),
+                produtoAtualizado.getQuantidade()
+        ));
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {

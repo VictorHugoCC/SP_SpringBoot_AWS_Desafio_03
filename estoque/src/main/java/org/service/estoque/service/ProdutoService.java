@@ -39,12 +39,24 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
-    public Produto atualizarQuantidade(Long id, int novaQuantidade) {
-        logger.info("Atualizando quantidade do produto com ID {} para {}", id, novaQuantidade);
+    public Produto atualizarQuantidade(Long id, int quantidadeSubtrair) {
         Produto produto = findProdutoOrThrow(id);
+
+        if (quantidadeSubtrair <= 0) {
+            throw new IllegalArgumentException("A quantidade a ser subtraída deve ser maior que 0.");
+        }
+
+        int novaQuantidade = produto.getQuantidade() - quantidadeSubtrair;
+        logger.info("Atualizando quantidade do produto com ID {}. Subtraindo: {}, nova quantia: {}", id, quantidadeSubtrair, novaQuantidade);
+        
+        if (novaQuantidade < 0) {
+            throw new IllegalArgumentException("Quantidade insuficiente no estoque para o produto com ID: " + id);
+        }
+
         produto.setQuantidade(novaQuantidade);
         return produtoRepository.save(produto);
     }
+
 
     private Produto findProdutoOrThrow(Long id) {
         return produtoRepository.findById(id)
