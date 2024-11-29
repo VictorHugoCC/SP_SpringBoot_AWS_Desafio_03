@@ -1,6 +1,7 @@
 package org.service.estoque.controller;
 
 import org.service.estoque.dto.ProdutoCreateDTO;
+import org.service.estoque.dto.ProdutoEstoqueDTO;
 import org.service.estoque.dto.ProdutoQuantidadeDTO;
 import org.service.estoque.dto.ProdutoResponseDTO;
 import org.service.estoque.model.Produto;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,6 +25,21 @@ public class ProdutoController {
         this.produtoService = produtoService;
     }
 
+    @GetMapping("/{produtoId}")
+    public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable Long produtoId) {
+        Optional<Produto> produto = produtoService.findById(produtoId);
+        if (produto.isPresent()) {
+            ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(
+                    produto.get().getId(),
+                    produto.get().getNome(),
+                    produto.get().getDescricao(),
+                    produto.get().getQuantidade()
+            );
+            return ResponseEntity.ok(responseDTO);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping
     public List<ProdutoResponseDTO> getAllProdutos() {
         return produtoService.findAll().stream()
@@ -30,24 +47,12 @@ public class ProdutoController {
                         produto.getId(),
                         produto.getNome(),
                         produto.getDescricao(),
-                        produto.getQuantidade(),
-                        produto.getPreco()
+                        produto.getQuantidade()
                 ))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable Long id) {
-        return produtoService.findById(id)
-                .map(produto -> ResponseEntity.ok(new ProdutoResponseDTO(
-                        produto.getId(),
-                        produto.getNome(),
-                        produto.getDescricao(),
-                        produto.getQuantidade(),
-                        produto.getPreco()
-                )))
-                .orElse(ResponseEntity.notFound().build());
-    }
+
 
     @PostMapping
     public ResponseEntity<ProdutoResponseDTO> createProduto(@RequestBody ProdutoCreateDTO produtoDTO) {
@@ -59,7 +64,6 @@ public class ProdutoController {
         novoProduto.setNome(produtoDTO.getNome());
         novoProduto.setDescricao(produtoDTO.getDescricao());
         novoProduto.setQuantidade(produtoDTO.getQuantidade());
-        novoProduto.setPreco(produtoDTO.getPreco());
 
         Produto produtoSalvo = produtoService.save(novoProduto);
 
@@ -67,8 +71,7 @@ public class ProdutoController {
                 produtoSalvo.getId(),
                 produtoSalvo.getNome(),
                 produtoSalvo.getDescricao(),
-                produtoSalvo.getQuantidade(),
-                produtoSalvo.getPreco()
+                produtoSalvo.getQuantidade()
         ));
     }
 
@@ -101,8 +104,7 @@ public class ProdutoController {
                     produtoAtualizado.getId(),
                     produtoAtualizado.getNome(),
                     produtoAtualizado.getDescricao(),
-                    produtoAtualizado.getQuantidade(),
-                    produtoAtualizado.getPreco()
+                    produtoAtualizado.getQuantidade()
             );
 
             return ResponseEntity.ok(responseDTO);
