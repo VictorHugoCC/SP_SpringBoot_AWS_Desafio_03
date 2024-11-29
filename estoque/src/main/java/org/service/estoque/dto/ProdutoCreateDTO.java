@@ -9,6 +9,4 @@ public class ProdutoCreateDTO {
     private String nome;
     private String descricao;
     private int quantidade;
-    private double preco;
-
 }

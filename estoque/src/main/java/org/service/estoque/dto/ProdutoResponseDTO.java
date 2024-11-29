@@ -12,12 +12,11 @@ public class ProdutoResponseDTO {
     private int quantidade;
     private double preco;
 
-    public ProdutoResponseDTO(Long id, String nome, String descricao, int quantidade, double preco) {
+    public ProdutoResponseDTO(Long id, String nome, String descricao, int quantidade) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.quantidade = quantidade;
-        this.preco = preco;
     }
 
 }

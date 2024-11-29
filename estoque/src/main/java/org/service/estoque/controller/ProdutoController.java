@@ -1,85 +1,55 @@
 package org.service.estoque.controller;
 
-import org.service.estoque.dto.ProdutoCreateDTO;
-import org.service.estoque.dto.ProdutoQuantidadeDTO;
 import org.service.estoque.dto.ProdutoResponseDTO;
 import org.service.estoque.model.Produto;
 import org.service.estoque.service.ProdutoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
-    @Autowired
-    private ProdutoService produtoService;
+    private final ProdutoService produtoService;
 
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
     }
 
     @GetMapping
-    public List<ProdutoResponseDTO> getAllProdutos() {
-        return produtoService.findAll().stream()
-                .map(produto -> new ProdutoResponseDTO(
-                        produto.getId(),
-                        produto.getNome(),
-                        produto.getDescricao(),
-                        produto.getQuantidade(),
-                        produto.getPreco()
-                ))
-                .collect(Collectors.toList());
+    public List<Produto> getAllProdutos() {
+        return produtoService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable Long id) {
+    public ResponseEntity<Produto> getProdutoById(@PathVariable Long id) {
         return produtoService.findById(id)
-                .map(produto -> ResponseEntity.ok(new ProdutoResponseDTO(
-                        produto.getId(),
-                        produto.getNome(),
-                        produto.getDescricao(),
-                        produto.getQuantidade(),
-                        produto.getPreco()
-                )))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> createProduto(@RequestBody ProdutoCreateDTO produtoDTO) {
-        Produto novoProduto = new Produto();
-        return getProdutoResponseDTOResponseEntity(produtoDTO, novoProduto);
+    public Produto createProduto(@RequestBody Produto produto) {
+        return produtoService.save(produto);
     }
 
-    private ResponseEntity<ProdutoResponseDTO> getProdutoResponseDTOResponseEntity(@RequestBody ProdutoCreateDTO produtoDTO, Produto novoProduto) {
-        novoProduto.setNome(produtoDTO.getNome());
-        novoProduto.setDescricao(produtoDTO.getDescricao());
-        novoProduto.setQuantidade(produtoDTO.getQuantidade());
-        novoProduto.setPreco(produtoDTO.getPreco());
-
-        Produto produtoSalvo = produtoService.save(novoProduto);
-
+    @PutMapping("/{id}/quantidade")
+    public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
+            @PathVariable Long id, @RequestParam int quantidade) {
+        Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidade);
         return ResponseEntity.ok(new ProdutoResponseDTO(
-                produtoSalvo.getId(),
-                produtoSalvo.getNome(),
-                produtoSalvo.getDescricao(),
-                produtoSalvo.getQuantidade(),
-                produtoSalvo.getPreco()
+                produtoAtualizado.getId(),
+                produtoAtualizado.getNome(),
+                produtoAtualizado.getDescricao(),
+                produtoAtualizado.getQuantidade()
         ));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> updateProduto(
-            @PathVariable Long id, @RequestBody ProdutoCreateDTO produtoDTO) {
-        return produtoService.findById(id)
-                .map(produtoExistente -> {
-                    return getProdutoResponseDTOResponseEntity(produtoDTO, produtoExistente);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/pedido/{id}")
+    public Object consultarPedido(@PathVariable Long id) {
+        return produtoService.buscarPedido(id);
     }
 
     @DeleteMapping("/{id}")
@@ -90,26 +60,4 @@ public class ProdutoController {
         }
         return ResponseEntity.notFound().build();
     }
-
-    @PatchMapping("/{id}/quantidade")
-    public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
-            @PathVariable Long id, @RequestBody ProdutoQuantidadeDTO quantidadeDTO) {
-        try {
-            Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidadeDTO.getQuantidade());
-
-            ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(
-                    produtoAtualizado.getId(),
-                    produtoAtualizado.getNome(),
-                    produtoAtualizado.getDescricao(),
-                    produtoAtualizado.getQuantidade(),
-                    produtoAtualizado.getPreco()
-            );
-
-            return ResponseEntity.ok(responseDTO);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-
 }
