@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "estoque-service", url = "http://localhost:8092")
 public interface EstoqueClient {
 
-    @GetMapping("/estoque/{produtoId}")
-    ProdutoEstoqueDTO getProdutoById(@PathVariable("produtoId") Long produtoId);
+    @GetMapping("/produtos/{produtoId}")
+    ProdutoEstoqueDTO getProdutoById(@PathVariable Long produtoId);
 
-    @PutMapping("/estoque/{produtoId}")
-    void atualizarQuantidade(@PathVariable("produtoId") Long produtoId, @RequestParam int quantidade);
+    @PutMapping("/produtos/{produtoId}/quantidade")
+    void atualizarQuantidade(@PathVariable Long produtoId, @RequestParam int quantidade);
 }
+
 

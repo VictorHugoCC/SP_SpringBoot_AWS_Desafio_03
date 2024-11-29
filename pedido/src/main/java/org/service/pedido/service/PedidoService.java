@@ -42,7 +42,8 @@ public class PedidoService {
                 throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoEstoque.getNome());
             }
 
-            estoqueClient.atualizarQuantidade(produtoId, -quantidade);
+            // Atualiza a quantidade subtraindo o valor solicitado
+            estoqueClient.atualizarQuantidade(produtoId, quantidade);
         });
 
         Pedido pedido = new Pedido();
@@ -59,8 +60,6 @@ public class PedidoService {
                 pedidoSalvo.getStatus()
         );
     }
-
-
 
     public List<PedidoResponseDTO> findAll() {
         logger.info("Buscando todos os pedidos no sistema...");
@@ -140,6 +139,4 @@ public class PedidoService {
                 ))
                 .collect(Collectors.toList());
     }
-
-
 }
