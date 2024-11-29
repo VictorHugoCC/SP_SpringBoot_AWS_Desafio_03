@@ -1,29 +1,29 @@
 package org.service.pedido.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
-@Entity
-@Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Entity
 public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String cliente;
 
+    @ElementCollection
+    @CollectionTable(name = "pedido_produto", joinColumns = @JoinColumn(name = "pedido_id"))
+    @MapKeyColumn(name = "produto_id")
+    @Column(name = "quantidade")
+    private Map<Long, Integer> produtos;
+
+    @Column(nullable = false)
     private String status;
-
-    private double total;
-
-    private LocalDateTime data = LocalDateTime.now();
 }

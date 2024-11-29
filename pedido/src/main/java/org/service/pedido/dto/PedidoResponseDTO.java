@@ -1,18 +1,23 @@
 package org.service.pedido.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 public class PedidoResponseDTO {
+
     private Long id;
     private String cliente;
+    private Map<Long, Integer> produtos;
     private String status;
-    private double total;
-    private LocalDateTime data;
+
+    public PedidoResponseDTO(Long id, String cliente, Map<Long, Integer> produtos, String status) {
+        this.id = id;
+        this.cliente = cliente;
+        this.produtos = produtos;
+        this.status = status;
+    }
 }

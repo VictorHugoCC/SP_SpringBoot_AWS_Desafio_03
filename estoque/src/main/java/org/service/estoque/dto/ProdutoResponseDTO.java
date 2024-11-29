@@ -10,7 +10,6 @@ public class ProdutoResponseDTO {
     private String nome;
     private String descricao;
     private int quantidade;
-    private double preco;
 
     public ProdutoResponseDTO(Long id, String nome, String descricao, int quantidade) {
         this.id = id;
