@@ -3,12 +3,14 @@ package org.service.pedido.service;
 import org.service.pedido.dto.PedidoRequestDTO;
 import org.service.pedido.dto.PedidoResponseDTO;
 import org.service.pedido.dto.ProdutoEstoqueDTO;
+import org.service.pedido.feign.ClienteClient;
 import org.service.pedido.feign.EstoqueClient;
 import org.service.pedido.model.Pedido;
 import org.service.pedido.repository.PedidoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,33 +27,38 @@ public class PedidoService {
     @Autowired
     private EstoqueClient estoqueClient;
 
+    @Autowired
+    private ClienteClient clienteClient;
+
     public PedidoService(PedidoRepository pedidoRepository, EstoqueClient estoqueClient) {
         this.pedidoRepository = pedidoRepository;
         this.estoqueClient = estoqueClient;
     }
 
     public PedidoResponseDTO criarPedido(PedidoRequestDTO pedidoRequestDTO) {
+        // Verifica se o cliente existe no microservice de cliente
+        ResponseEntity<Object> clienteResponse = clienteClient.getClienteById(pedidoRequestDTO.getCliente());
+        if (clienteResponse.getBody() == null) {
+            throw new IllegalArgumentException("Cliente com ID " + pedidoRequestDTO.getCliente() + " não encontrado.");
+        }
+
+        logger.info("Cliente encontrado: ID {}", pedidoRequestDTO.getCliente());
+
+        // Atualiza o estoque para cada produto solicitado
         pedidoRequestDTO.getProdutos().forEach((produtoId, quantidade) -> {
-            ProdutoEstoqueDTO produtoEstoque = estoqueClient.getProdutoById(produtoId);
-
-            if (produtoEstoque == null) {
-                throw new IllegalArgumentException("Produto com ID " + produtoId + " não encontrado no estoque.");
-            }
-
-            if (produtoEstoque.getQuantidade() < quantidade) {
-                throw new IllegalArgumentException("Estoque insuficiente para o produto: " + produtoEstoque.getNome());
-            }
-
-            // Atualiza a quantidade subtraindo o valor solicitado
+            logger.info("Atualizando estoque para Produto ID: {} com Quantidade: {}", produtoId, quantidade);
             estoqueClient.atualizarQuantidade(produtoId, quantidade);
         });
 
+        // Cria o pedido
         Pedido pedido = new Pedido();
-        pedido.setCliente(pedidoRequestDTO.getCliente());
+        pedido.setCliente(pedidoRequestDTO.getCliente().toString()); // Associa o ID do cliente
         pedido.setProdutos(pedidoRequestDTO.getProdutos());
         pedido.setStatus("CONFIRMADO");
 
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
+
+        logger.info("Pedido criado com sucesso! ID: {}, Cliente ID: {}", pedidoSalvo.getId(), pedidoSalvo.getCliente());
 
         return new PedidoResponseDTO(
                 pedidoSalvo.getId(),
@@ -60,6 +67,7 @@ public class PedidoService {
                 pedidoSalvo.getStatus()
         );
     }
+
 
     public List<PedidoResponseDTO> findAll() {
         logger.info("Buscando todos os pedidos no sistema...");
@@ -128,8 +136,11 @@ public class PedidoService {
         logger.info("Todos os pedidos foram deletados com sucesso.");
     }
 
-    public List<PedidoResponseDTO> findByClienteId(String clienteNome) {
-        List<Pedido> pedidos = pedidoRepository.findByCliente(clienteNome);
+    public List<PedidoResponseDTO> findByClienteId(Long clienteId) {
+        logger.info("Buscando pedidos para o cliente ID: {}", clienteId);
+
+        List<Pedido> pedidos = pedidoRepository.findByCliente(clienteId.toString());
+
         return pedidos.stream()
                 .map(pedido -> new PedidoResponseDTO(
                         pedido.getId(),
@@ -139,4 +150,6 @@ public class PedidoService {
                 ))
                 .collect(Collectors.toList());
     }
+
+
 }

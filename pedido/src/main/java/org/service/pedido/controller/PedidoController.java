@@ -58,10 +58,11 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/cliente")
-    public ResponseEntity<List<PedidoResponseDTO>> getPedidosByClienteNome(@RequestParam String clienteNome) {
-        return ResponseEntity.ok(pedidoService.findByClienteId(clienteNome));
+    @GetMapping("/cliente/{clienteId}")
+    public ResponseEntity<List<PedidoResponseDTO>> getPedidosByClienteId(@PathVariable Long clienteId) {
+        return ResponseEntity.ok(pedidoService.findByClienteId(clienteId));
     }
+
 
 
 
