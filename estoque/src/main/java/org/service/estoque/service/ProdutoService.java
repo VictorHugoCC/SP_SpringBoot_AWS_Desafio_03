@@ -48,7 +48,7 @@ public class ProdutoService {
 
         int novaQuantidade = produto.getQuantidade() - quantidadeSubtrair;
         logger.info("Atualizando quantidade do produto com ID {}. Subtraindo: {}, nova quantia: {}", id, quantidadeSubtrair, novaQuantidade);
-        
+
         if (novaQuantidade < 0) {
             throw new IllegalArgumentException("Quantidade insuficiente no estoque para o produto com ID: " + id);
         }
