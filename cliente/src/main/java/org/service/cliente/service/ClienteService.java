@@ -18,44 +18,14 @@ import java.util.stream.Collectors;
 @Service
 public class ClienteService {
 
-    @Autowired
-    private static Logger logger = LoggerFactory.getLogger(ClienteService.class);
+
+    private final static Logger logger = LoggerFactory.getLogger(ClienteService.class);
 
     @Autowired
     private ClienteRepository clienteRepository;
 
     @Autowired
     private PedidoClient pedidoClient;
-
-    public ClienteResponseDTO findClienteComPedidos(Long clienteId) {
-        logger.info("Buscando cliente com ID {} e seus pedidos", clienteId);
-
-        Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> {
-                    logger.warn("Cliente com ID {} não encontrado.", clienteId);
-                    return new ClienteNotFoundException("Cliente não encontrado com ID " + clienteId);
-                });
-
-        // Busque os pedidos do cliente
-        List<Object> pedidos;
-        try {
-            pedidos = pedidoClient.getPedidosByClienteId(clienteId); // Use o Feign para buscar os pedidos
-        } catch (Exception e) {
-            logger.error("Erro ao buscar pedidos para o cliente ID {}: {}", clienteId, e.getMessage());
-            pedidos = Collections.emptyList();
-        }
-
-        // Converta o cliente e seus pedidos para ClienteResponseDTO
-        ClienteResponseDTO clienteResponse = new ClienteResponseDTO();
-        clienteResponse.setId(cliente.getId());
-        clienteResponse.setNome(cliente.getNome());
-        clienteResponse.setEmail(cliente.getEmail());
-        clienteResponse.setTelefone(cliente.getTelefone());
-        clienteResponse.setPedidos(pedidos);
-
-        return clienteResponse;
-    }
-
 
     public List<ClienteResponseDTO> findAllClientesComPedidos() {
         List<Cliente> clientes = clienteRepository.findAll();
@@ -67,7 +37,6 @@ public class ClienteService {
                     clienteResponse.setEmail(cliente.getEmail());
                     clienteResponse.setTelefone(cliente.getTelefone());
 
-                    // Busque pedidos relacionados
                     try {
                         List<Object> pedidos = pedidoClient.getPedidosByClienteId(cliente.getId());
                         clienteResponse.setPedidos(pedidos);

@@ -23,5 +23,5 @@ public class Cliente {
     private String endereco;
 
     @Transient
-    private List<Object> pedidos = new ArrayList<>(); // Transient para não persistir no banco
+    private List<Object> pedidos = new ArrayList<>();
 }
