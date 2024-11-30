@@ -3,6 +3,9 @@ package org.service.cliente.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 public class Cliente {
@@ -18,4 +21,7 @@ public class Cliente {
     private String telefone;
 
     private String endereco;
+
+    @Transient
+    private List<Object> pedidos = new ArrayList<>(); // Transient para não persistir no banco
 }
