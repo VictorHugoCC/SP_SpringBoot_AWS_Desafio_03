@@ -11,8 +11,8 @@ import java.util.Map;
 public class PedidoRequestDTO {
 
     @NotNull
-    private Long cliente; // Altere aqui de String para Long
+    private Long cliente;
 
     @NotNull
-    private Map<Long, Integer> produtos; // ID do produto e quantidade
+    private Map<Long, Integer> produtos;
 }

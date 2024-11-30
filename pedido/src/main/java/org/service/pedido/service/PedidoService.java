@@ -36,7 +36,6 @@ public class PedidoService {
     }
 
     public PedidoResponseDTO criarPedido(PedidoRequestDTO pedidoRequestDTO) {
-        // Verifica se o cliente existe no microservice de cliente
         ResponseEntity<Object> clienteResponse = clienteClient.getClienteById(pedidoRequestDTO.getCliente());
         if (clienteResponse.getBody() == null) {
             throw new IllegalArgumentException("Cliente com ID " + pedidoRequestDTO.getCliente() + " não encontrado.");
@@ -44,15 +43,13 @@ public class PedidoService {
 
         logger.info("Cliente encontrado: ID {}", pedidoRequestDTO.getCliente());
 
-        // Atualiza o estoque para cada produto solicitado
         pedidoRequestDTO.getProdutos().forEach((produtoId, quantidade) -> {
             logger.info("Atualizando estoque para Produto ID: {} com Quantidade: {}", produtoId, quantidade);
             estoqueClient.atualizarQuantidade(produtoId, quantidade);
         });
 
-        // Cria o pedido
         Pedido pedido = new Pedido();
-        pedido.setCliente(pedidoRequestDTO.getCliente().toString()); // Associa o ID do cliente
+        pedido.setCliente(pedidoRequestDTO.getCliente().toString());
         pedido.setProdutos(pedidoRequestDTO.getProdutos());
         pedido.setStatus("CONFIRMADO");
 
@@ -67,7 +64,6 @@ public class PedidoService {
                 pedidoSalvo.getStatus()
         );
     }
-
 
     public List<PedidoResponseDTO> findAll() {
         logger.info("Buscando todos os pedidos no sistema...");
