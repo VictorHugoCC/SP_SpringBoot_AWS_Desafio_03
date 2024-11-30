@@ -56,10 +56,4 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/{id}/historico-pedidos")
-    public ResponseEntity<Object> getHistoricoPedidos(@PathVariable Long id) {
-        return ResponseEntity.ok(clienteService.getHistoricoPedidos(id));
-    }
-
 }
