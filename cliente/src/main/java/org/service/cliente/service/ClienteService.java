@@ -1,7 +1,6 @@
 package org.service.cliente.service;
 
 import org.service.cliente.dto.ClienteResponseDTO;
-import org.service.cliente.exception.ClienteNotFoundException;
 import org.service.cliente.feign.PedidoClient;
 import org.service.cliente.model.Cliente;
 import org.service.cliente.repository.ClienteRepository;
