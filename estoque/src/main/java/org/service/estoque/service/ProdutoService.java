@@ -60,6 +60,22 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
+    public Produto incrementarQuantidade(Long id, int quantidadeAdicionar) {
+        Produto produto = findProdutoOrThrow(id);
+
+        if (quantidadeAdicionar <= 0) {
+            logger.error("Quantidade inválida para adicionar ao produto com ID {}. Quantidade: {}", id, quantidadeAdicionar);
+            throw new QuantidadeInvalidaException("A quantidade a ser adicionada deve ser maior que 0.");
+        }
+
+        int novaQuantidade = produto.getQuantidade() + quantidadeAdicionar;
+        logger.info("Incrementando quantidade do produto com ID {}. Adicionando: {}, nova quantidade: {}", id, quantidadeAdicionar, novaQuantidade);
+
+        produto.setQuantidade(novaQuantidade);
+        return produtoRepository.save(produto);
+    }
+
+
     public Produto atualizarQuantidade(Long id, int quantidadeSubtrair) {
         Produto produto = findProdutoOrThrow(id);
 

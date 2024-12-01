@@ -88,6 +88,14 @@ public class ProdutoController {
     }
 
 
+    @PatchMapping("/{id}/quantidade/incrementar")
+    public ResponseEntity<Produto> incrementarQuantidade(
+            @PathVariable Long id,
+            @RequestParam int quantidadeAdicionar) {
+        Produto produtoAtualizado = produtoService.incrementarQuantidade(id, quantidadeAdicionar);
+        return ResponseEntity.ok(produtoAtualizado);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
