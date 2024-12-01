@@ -1,48 +1,93 @@
 package org.service.estoque.controller;
 
+import org.service.estoque.dto.ProdutoCreateDTO;
+import org.service.estoque.dto.ProdutoEstoqueDTO;
+import org.service.estoque.dto.ProdutoQuantidadeDTO;
+import org.service.estoque.dto.ProdutoResponseDTO;
 import org.service.estoque.model.Produto;
 import org.service.estoque.service.ProdutoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
-    private final ProdutoService produtoService;
+    @Autowired
+    private ProdutoService produtoService;
 
     public ProdutoController(ProdutoService produtoService) {
         this.produtoService = produtoService;
     }
 
-    @GetMapping
-    public List<Produto> getAllProdutos() {
-        return produtoService.findAll();
+    @GetMapping("/{produtoId}")
+    public ResponseEntity<ProdutoResponseDTO> getProdutoById(@PathVariable Long produtoId) {
+        Optional<Produto> produto = produtoService.findById(produtoId);
+        if (produto.isPresent()) {
+            ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(
+                    produto.get().getId(),
+                    produto.get().getNome(),
+                    produto.get().getDescricao(),
+                    produto.get().getQuantidade()
+            );
+            return ResponseEntity.ok(responseDTO);
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Produto> getProdutoById(@PathVariable Long id) {
-        return produtoService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping
+    public List<ProdutoResponseDTO> getAllProdutos() {
+        return produtoService.findAll().stream()
+                .map(produto -> new ProdutoResponseDTO(
+                        produto.getId(),
+                        produto.getNome(),
+                        produto.getDescricao(),
+                        produto.getQuantidade()
+                ))
+                .collect(Collectors.toList());
     }
+
+
 
     @PostMapping
-    public Produto createProduto(@RequestBody Produto produto) {
-        return produtoService.save(produto);
+    public ResponseEntity<ProdutoResponseDTO> createProduto(@RequestBody ProdutoCreateDTO produtoDTO) {
+        Produto novoProduto = new Produto();
+        return getProdutoResponseDTOResponseEntity(produtoDTO, novoProduto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Produto> updateProduto(@PathVariable Long id, @RequestBody Produto produto) {
-        return produtoService.findById(id)
-                .map(existingProduto -> {
-                    produto.setId(existingProduto.getId());
-                    return ResponseEntity.ok(produtoService.save(produto));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    private ResponseEntity<ProdutoResponseDTO> getProdutoResponseDTOResponseEntity(@RequestBody ProdutoCreateDTO produtoDTO, Produto novoProduto) {
+        novoProduto.setNome(produtoDTO.getNome());
+        novoProduto.setDescricao(produtoDTO.getDescricao());
+        novoProduto.setQuantidade(produtoDTO.getQuantidade());
+
+        Produto produtoSalvo = produtoService.save(novoProduto);
+
+        return ResponseEntity.ok(new ProdutoResponseDTO(
+                produtoSalvo.getId(),
+                produtoSalvo.getNome(),
+                produtoSalvo.getDescricao(),
+                produtoSalvo.getQuantidade()
+        ));
     }
+
+    @PutMapping("/{id}/quantidade")
+    public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
+            @PathVariable Long id, @RequestParam int quantidade) {
+        Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidade);
+        return ResponseEntity.ok(new ProdutoResponseDTO(
+                produtoAtualizado.getId(),
+                produtoAtualizado.getNome(),
+                produtoAtualizado.getDescricao(),
+                produtoAtualizado.getQuantidade()
+        ));
+    }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduto(@PathVariable Long id) {
@@ -53,23 +98,22 @@ public class ProdutoController {
         return ResponseEntity.notFound().build();
     }
 
-    @PatchMapping("/{id}/reduzir")
-    public ResponseEntity<Void> reduzirEstoque(@PathVariable Long id, @RequestParam int quantidade) {
+    @PatchMapping("/{id}/quantidade")
+    public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
+            @PathVariable Long id, @RequestBody ProdutoQuantidadeDTO quantidadeDTO) {
         try {
-            produtoService.reduzirEstoque(id, quantidade);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
+            Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidadeDTO.getQuantidade());
 
-    @PatchMapping("/{id}/aumentar")
-    public ResponseEntity<Void> aumentarEstoque(@PathVariable Long id, @RequestParam int quantidade) {
-        try {
-            produtoService.aumentarEstoque(id, quantidade);
-            return ResponseEntity.noContent().build();
+            ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(
+                    produtoAtualizado.getId(),
+                    produtoAtualizado.getNome(),
+                    produtoAtualizado.getDescricao(),
+                    produtoAtualizado.getQuantidade()
+            );
+
+            return ResponseEntity.ok(responseDTO);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.notFound().build();
         }
     }
 }
