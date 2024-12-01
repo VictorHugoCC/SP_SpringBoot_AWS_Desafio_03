@@ -10,4 +10,11 @@ public class ProdutoEstoqueDTO {
     private String nome;
     private int quantidade;
     private double preco;
+
+    public ProdutoEstoqueDTO(Long id, String nome, int quantidade, double preco) {
+        this.id = id;
+        this.nome = nome;
+        this.quantidade = quantidade;
+        this.preco = preco;
+    }
 }
