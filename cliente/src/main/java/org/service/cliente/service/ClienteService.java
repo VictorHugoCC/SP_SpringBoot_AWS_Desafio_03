@@ -83,26 +83,28 @@ public class ClienteService {
     public Cliente updateCliente(Long id, Cliente updatedCliente) {
         logger.info("Atualizando cliente com ID: {}", id);
 
+        // Verifique se o cliente existe
+        Cliente existingCliente = clienteRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Cliente com ID {} não encontrado para atualização.", id);
+                    return new ClienteNotFoundException("Cliente com ID " + id + " não encontrado.");
+                });
+
+        // Realize validações nos dados fornecidos
         if (updatedCliente.getNome() == null || updatedCliente.getEmail() == null) {
             logger.error("Dados inválidos fornecidos para o cliente com ID: {}", id);
             throw new ClienteValidationException("Dados inválidos fornecidos para o cliente.");
         }
 
-        return clienteRepository.findById(id)
-                .map(existingCliente -> {
-                    existingCliente.setNome(updatedCliente.getNome());
-                    existingCliente.setEmail(updatedCliente.getEmail());
-                    existingCliente.setTelefone(updatedCliente.getTelefone());
-                    existingCliente.setEndereco(updatedCliente.getEndereco());
-                    Cliente clienteAtualizado = clienteRepository.save(existingCliente);
-                    logger.info("Cliente com ID {} atualizado com sucesso.", id);
-                    return clienteAtualizado;
-                })
-                .orElseThrow(() -> {
-                    logger.error("Cliente com ID {} não encontrado para atualização.", id);
-                    return new ClienteNotFoundException("Cliente com ID " + id + " não encontrado.");
-                });
+        // Atualize os dados do cliente existente
+        existingCliente.setNome(updatedCliente.getNome());
+        existingCliente.setEmail(updatedCliente.getEmail());
+        existingCliente.setTelefone(updatedCliente.getTelefone());
+        existingCliente.setEndereco(updatedCliente.getEndereco());
+
+        return clienteRepository.save(existingCliente);
     }
+
 
 
     public void deleteCliente(Long id) {

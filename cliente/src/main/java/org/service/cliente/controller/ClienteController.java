@@ -2,6 +2,7 @@ package org.service.cliente.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.service.cliente.dto.ClienteResponseDTO;
 import org.service.cliente.model.Cliente;
 import org.service.cliente.service.ClienteService;
@@ -38,9 +39,10 @@ public class ClienteController {
 
     @Operation(summary = "Criar um novo cliente", description = "Cria um cliente e retorna os detalhes do cliente criado")
     @PostMapping
-    public ResponseEntity<Cliente> createCliente(@RequestBody Cliente cliente) {
+    public ResponseEntity<Cliente> createCliente(@Valid @RequestBody Cliente cliente) {
         return ResponseEntity.ok(clienteService.createCliente(cliente));
     }
+
 
     @Operation(summary = "Atualizar cliente", description = "Atualiza os detalhes de um cliente específico pelo ID")
     @PutMapping("/{id}")
