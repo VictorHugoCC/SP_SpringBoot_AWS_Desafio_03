@@ -15,4 +15,9 @@ public class PedidoRequestDTO {
 
     @NotNull
     private Map<Long, Integer> produtos;
+
+    public PedidoRequestDTO(Long cliente, Map<Long, Integer> produtos) {
+        this.cliente = cliente;
+        this.produtos = produtos;
+    }
 }

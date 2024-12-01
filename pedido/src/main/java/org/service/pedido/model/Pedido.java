@@ -26,4 +26,14 @@ public class Pedido {
 
     @Column(nullable = false)
     private String status;
+
+    public Pedido() {
+    }
+
+    public Pedido(Long id, String cliente, Map<Long, Integer> produtos, String status) {
+        this.id = id;
+        this.cliente = cliente;
+        this.produtos = produtos;
+        this.status = status;
+    }
 }
