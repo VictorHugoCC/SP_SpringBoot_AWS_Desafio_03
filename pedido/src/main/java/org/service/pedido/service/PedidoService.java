@@ -93,7 +93,18 @@ public class PedidoService {
                 pedidoSalvo.getStatus()
         );
     }
-    
+
+    public boolean isProdutoInPedido(Long produtoId) {
+        logger.info("Verificando se o Produto ID {} está em algum pedido...", produtoId);
+
+        boolean isInPedido = pedidoRepository.findAll().stream()
+                .anyMatch(pedido -> pedido.getProdutos().containsKey(produtoId));
+
+        logger.info("Produto ID {} está em pedido: {}", produtoId, isInPedido);
+        return isInPedido;
+    }
+
+
     public List<PedidoResponseDTO> findAll() {
         logger.info("Buscando todos os pedidos no sistema...");
         List<PedidoResponseDTO> pedidos = pedidoRepository.findAll().stream()

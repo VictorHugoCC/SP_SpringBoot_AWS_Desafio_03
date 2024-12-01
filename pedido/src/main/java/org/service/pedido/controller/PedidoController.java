@@ -32,6 +32,13 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.findAll());
     }
 
+    @GetMapping("/produto")
+    public ResponseEntity<Boolean> isProdutoInPedido(@RequestParam Long produtoId) {
+        boolean isInPedido = pedidoService.isProdutoInPedido(produtoId);
+        return ResponseEntity.ok(isInPedido);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<PedidoResponseDTO> buscarPedidoPorId(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.buscarPedidoPorId(id));
