@@ -18,13 +18,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(EstoqueInsuficienteException.class)
-    public ResponseEntity<String> handleEstoqueInsuficienteException(EstoqueInsuficienteException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno no servidor: " + ex.getMessage());
+    @ExceptionHandler(ProdutoEmPedidoException.class)
+    public ResponseEntity<String> handleProdutoEmPedidoException(ProdutoEmPedidoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }
