@@ -102,13 +102,15 @@ public class ProdutoController {
     public ResponseEntity<ProdutoResponseDTO> atualizarQuantidade(
             @PathVariable Long id, @RequestParam int quantidade) {
         Produto produtoAtualizado = produtoService.atualizarQuantidade(id, quantidade);
-        return ResponseEntity.ok(new ProdutoResponseDTO(
+        ProdutoResponseDTO responseDTO = new ProdutoResponseDTO(
                 produtoAtualizado.getId(),
                 produtoAtualizado.getNome(),
                 produtoAtualizado.getDescricao(),
                 produtoAtualizado.getQuantidade()
-        ));
+        );
+        return ResponseEntity.ok(responseDTO);
     }
+
 
     @Operation(summary = "Deletar produto", description = "Remove um produto específico pelo ID")
     @ApiResponses(value = {
