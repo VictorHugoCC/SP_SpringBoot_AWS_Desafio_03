@@ -14,7 +14,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres-cliente-data:/var/lib/postgresql/data
-      - ./init-cliente.sql:/docker-entrypoint-initdb.d/init-cliente.sql
     networks:
       - app-network
 
@@ -29,7 +28,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres-estoque-data:/var/lib/postgresql/data
-      - ./init-estoque.sql:/docker-entrypoint-initdb.d/init-estoque.sql
     networks:
       - app-network
 
@@ -44,7 +42,6 @@ services:
       - "5434:5432"
     volumes:
       - postgres-pedido-data:/var/lib/postgresql/data
-      - ./init-pedido.sql:/docker-entrypoint-initdb.d/init-pedido.sql
     networks:
       - app-network
 
