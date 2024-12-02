@@ -9,61 +9,35 @@ on:
       - main
 
 jobs:
-  build-test-deploy:
+  build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres-cliente:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: cliente_user
-          POSTGRES_PASSWORD: cliente_password
-          POSTGRES_DB: cliente_db
-        ports:
-          - 5432:5432
-
-      postgres-estoque:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: estoque_user
-          POSTGRES_PASSWORD: estoque_password
-          POSTGRES_DB: estoque_db
-        ports:
-          - 5433:5432
-
-      postgres-pedido:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: pedido_user
-          POSTGRES_PASSWORD: pedido_password
-          POSTGRES_DB: pedido_db
-        ports:
-          - 5434:5432
-
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: 'temurin'
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-      - name: Build with Maven
-        run: mvn clean package
+      - name: Build and Test Cliente
+        working-directory: ./cliente
+        run: |
+          mvn clean package
 
-      - name: Run Unit Tests
-        run: mvn test
+      - name: Build and Test Estoque
+        working-directory: ./estoque
+        run: |
+          mvn clean package
 
-      - name: Docker Compose up
-        run: docker-compose -f docker-compose.yml up --build -d
+      - name: Build and Test Pedido
+        working-directory: ./pedido
+        run: |
+          mvn clean package
 
-      - name: Docker Compose down
-        if: always()
+      - name: Start Docker Compose
+        run: docker-compose up --build -d
+
+      - name: Stop Docker Compose
         run: docker-compose down
