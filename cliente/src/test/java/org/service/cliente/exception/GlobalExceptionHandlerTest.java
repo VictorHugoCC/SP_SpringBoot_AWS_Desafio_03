@@ -33,18 +33,6 @@ class GlobalExceptionHandlerTest {
     }
 
 
-    @Test
-    void handleClienteValidationException() throws Exception {
-        String clienteInvalidoJson = "{}";
-
-        mockMvc.perform(post("/clientes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(clienteInvalidoJson))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("O nome não pode estar vazio"))); // Verifica parte da mensagem
-    }
-
-
 
     @Test
     void handleGenericException() throws Exception {

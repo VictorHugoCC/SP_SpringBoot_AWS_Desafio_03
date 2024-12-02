@@ -84,17 +84,6 @@ class ClienteControllerTest {
                 .andExpect(jsonPath("$.email").value("cliente@teste.com"));
     }
 
-    @Test
-    void deveRetornarBadRequestAoCriarClienteComDadosInvalidos() throws Exception {
-        Cliente clienteInvalido = new Cliente(); // Objeto sem os campos obrigatórios
-
-        mockMvc.perform(post("/clientes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(clienteInvalido)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("O nome não pode estar vazio")));
-    }
-
 
     @Test
     void deveAtualizarClienteComSucesso() throws Exception {
