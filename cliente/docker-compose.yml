@@ -13,7 +13,7 @@ services:
 
   cliente:
     build:
-      context: ./cliente
+      context: .
     container_name: cliente
     depends_on:
       - postgres-cliente

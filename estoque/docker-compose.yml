@@ -13,7 +13,7 @@ services:
 
   estoque:
     build:
-      context: ./estoque
+      context: .
     container_name: estoque
     depends_on:
       - postgres-estoque

@@ -13,7 +13,7 @@ services:
 
   pedido:
     build:
-      context: ./pedido
+      context: .
     container_name: pedido
     depends_on:
       - postgres-pedido
