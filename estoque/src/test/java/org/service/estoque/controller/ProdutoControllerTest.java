@@ -51,13 +51,10 @@ class ProdutoControllerTest {
 
     @Test
     void deveRetornarListaDeProdutosComDados() throws Exception {
-        // Configurando um objeto Produto com valores válidos
         Produto produto = new Produto(1L, "Produto Teste", "Descrição Teste", 100);
 
-        // Configurando o mock para retornar a lista de produtos
         when(produtoService.findAll()).thenReturn(Collections.singletonList(produto));
 
-        // Executando o teste
         mockMvc.perform(get("/produtos")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -70,19 +67,15 @@ class ProdutoControllerTest {
 
     @Test
     void deveCriarProdutoComSucesso() throws Exception {
-        // DTO de criação de produto
         ProdutoCreateDTO produtoDTO = new ProdutoCreateDTO();
         produtoDTO.setNome("Produto Novo");
         produtoDTO.setDescricao("Descrição Nova");
         produtoDTO.setQuantidade(200);
 
-        // Objeto Produto esperado
         Produto produtoCriado = new Produto(1L, "Produto Novo", "Descrição Nova", 200);
 
-        // Configurando o mock para salvar o produto
         when(produtoService.save(any(Produto.class))).thenReturn(produtoCriado);
 
-        // Executando o teste
         mockMvc.perform(post("/produtos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(produtoDTO)))
@@ -96,13 +89,10 @@ class ProdutoControllerTest {
 
     @Test
     void deveAtualizarQuantidadeDoProdutoComSucesso() throws Exception {
-        // Objeto Produto atualizado esperado
         Produto produtoAtualizado = new Produto(1L, "Produto Atualizado", "Descrição Atualizada", 150);
 
-        // Configurando o mock para atualizar a quantidade do produto
         when(produtoService.atualizarQuantidade(anyLong(), eq(150))).thenReturn(produtoAtualizado);
 
-        // Executando o teste
         mockMvc.perform(put("/produtos/1/quantidade")
                         .param("quantidade", "150")
                         .contentType(MediaType.APPLICATION_JSON))
