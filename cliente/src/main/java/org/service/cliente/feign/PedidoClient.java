@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
-@FeignClient(name = "pedido-service", url = "http://localhost:8094/pedidos")
+@FeignClient(name = "pedido-service", url = "http://ec2-18-118-140-64.us-east-2.compute.amazonaws.com:8080/pedidos")
 public interface PedidoClient {
 
     @GetMapping("/cliente/{clienteId}")
