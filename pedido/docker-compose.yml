@@ -26,7 +26,7 @@ services:
       SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
     ports:
-      - "8080:8090"
+      - "8082:8090"
 
 volumes:
   postgres-pedido-data:
