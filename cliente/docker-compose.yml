@@ -1,0 +1,32 @@
+services:
+  postgres-cliente:
+    image: postgres:latest
+    container_name: postgres-cliente
+    environment:
+      POSTGRES_USER: cliente_user
+      POSTGRES_PASSWORD: cliente_password
+      POSTGRES_DB: cliente_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-cliente-data:/var/lib/postgresql/data
+
+  cliente:
+    build:
+      context: ./cliente
+    container_name: cliente
+    depends_on:
+      - postgres-cliente
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-cliente:5432/cliente_db
+      SPRING_DATASOURCE_USERNAME: cliente_user
+      SPRING_DATASOURCE_PASSWORD: cliente_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+    ports:
+      - "8093:8080"
+
+volumes:
+  postgres-cliente-data:

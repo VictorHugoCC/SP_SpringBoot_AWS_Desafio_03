@@ -1,0 +1,32 @@
+services:
+  postgres-pedido:
+    image: postgres:latest
+    container_name: postgres-pedido
+    environment:
+      POSTGRES_USER: pedido_user
+      POSTGRES_PASSWORD: pedido_password
+      POSTGRES_DB: pedido_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-pedido-data:/var/lib/postgresql/data
+
+  pedido:
+    build:
+      context: ./pedido
+    container_name: pedido
+    depends_on:
+      - postgres-pedido
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-pedido:5432/pedido_db
+      SPRING_DATASOURCE_USERNAME: pedido_user
+      SPRING_DATASOURCE_PASSWORD: pedido_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+    ports:
+      - "8092:8080"
+
+volumes:
+  postgres-pedido-data:
