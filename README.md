@@ -150,8 +150,8 @@ Aqui estão alguns exemplos de endpoints de API para cada serviço:
 3. Monitore os logs de cada serviço para verificar o fluxo de trabalho.
 
 ---
-## 🎬 Demostração
-- Segue abaixo os links para os videos das Demostraçãodas aplicações funcionando dentro da EC2
+## 🎬 Demostração/Evidencias
+- Segue abaixo os links para os videos das Demostrações das aplicações/evidencias funcionando dentro da EC2
 https://drive.google.com/drive/folders/1PIDsHL0uEsghDS5Lvx640tzPkdbEUYEM?usp=sharing
 
 ## 📊 Monitoramento e Logs
